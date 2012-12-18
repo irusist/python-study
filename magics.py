@@ -141,3 +141,65 @@ print cl[4] + cl[2]     # 9
 print cl.counter        # 2
 
 
+class Rectangle:
+    def __init__(self):
+        self.width = 0
+        self.height = 0
+
+    def setSize(self, size):
+        self.width, self.height = size
+
+    def getSize(self):
+        return self.width, self.height
+r = Rectangle()
+r.width = 10
+r.height = 5
+print r.getSize()         # (10, 5)
+r.setSize((150, 100))
+print r.getSize()         # (150, 100)
+print r.width             # 150
+
+
+# property(getSize, setSize),第一个参数是get方法，第二个参数是set方法
+# property有4个参数：
+# fget: 对应get方法，内部用__get__(self)实现，相当于class.property
+# fset: 对应set方法，内部用__set__(self, value)实现，相当于class.property = value
+# fdel: 对应del方法，内部用__del__(self)实现，相当于del class.property
+# doc:  说明性文档
+__metaclass__ = type
+class Rectangle:
+    def __init__(self):
+        self.width = 0
+        self.height = 0
+
+    def setSize(self, size):
+        self.width, self.height = size
+
+    def getSize(self):
+        return self.width, self.height
+
+    size = property(getSize, setSize)
+r = Rectangle()
+r.width = 10
+r.height = 5
+print r.size      # 调用getSize方法(property的get方法)
+r.size = 150, 100    # 调用setSize方法(property的set方法)
+print r.width           # 150
+
+
+# 静态方法和类方法
+__metaclass__ = type
+class MyClass:
+    @staticmethod
+    def smeth():
+        print 'This is a static method'
+
+    @classmethod
+    def cmeth(cls):
+        print 'This is a class method of', cls
+MyClass.smeth()     # This is a static method
+MyClass.cmeth()     # This is a class method of <class '__main__.MyClass'>
+cls = MyClass()
+# 可以在类的实例上调用静态方法和类方法
+cls.smeth()         # This is a static method
+cls.cmeth()         # This is a class method of <class '__main__.MyClass'>
