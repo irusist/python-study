@@ -26,6 +26,11 @@ __author__ = 'zhulixin'
 # https://github.com/dabloem
 # https://chrome.google.com/webstore/category/home?hl=zh-CN
 
+# http://mathworld.wolfram.com/Graph.html
+# http://mathworld.wolfram.com/Tree.html
+# http://xlinux.nist.gov/dads//HTML/tree.html
+# http://xlinux.nist.gov/dads//HTML/graph.html
+
 
 # 实例化一个类时，会调用__init__方法，相当于构造方法
 # __del__方法在对象被垃圾回收的时候调用，相当于java的finalize方法
@@ -235,4 +240,146 @@ rt = Rectangle()
 # setattr height
 rt.size = 6, 9
 # getattr
-print rt.size    # (6, 9)
+# (6, 9)
+print rt.size
+#　9
+print rt.height
+
+
+# 实现__iter__方法的类表示是可迭代的，可用在for语句中
+# __iter__方法返回迭代器，迭代器必须实现next方法，如果next方法被调用，迭代器没有返回值，则抛出StopIteration异常
+# (在python3.0中迭代器必须实现__next__方法，可以通过next(iterator)来获取下一个值
+class Fibs:
+    def __init__(self):
+        self.a = 0
+        self.b = 1
+
+    def next(self):
+        self.a, self.b = self.b, self.a + self.b
+        return self.a
+
+    def __iter__(self):
+        return self
+# 1597
+fibs = Fibs()
+for f in fibs:
+    if f > 1000:
+        print f
+        break
+
+# 内建函数iter可以从迭代对象(有__iter__方法)中获取迭代器
+it = iter([1, 2, 3])
+print it.next()  # 1
+print it.next()  # 2
+
+
+# 内建的list函数将可迭代的对象(有__iter__方法)转化为list
+class TestIterator:
+    value = 0
+
+    def next(self):
+        self.value += 1
+        if self.value > 10:
+            raise StopIteration
+        return self.value
+
+    def __iter__(self):
+        return self
+ti = TestIterator()
+print list(ti)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+
+# 包含yield语句的函数是生成器(使用yield语句每次产生一个值，函数会被冻结，停在那等待被激活
+# 函数被激活后就从停止的那点开始执行)
+def flatten(nested):
+    for sublist in nested:
+        for element in sublist:
+            yield element
+nested = [[1, 2], [3, 4], [5]]
+# <generator object flatten at 0x017F7AA8>
+print flatten(nested)
+# 1
+# 2
+# 3
+# 4
+# 5
+for num in flatten(nested):
+    print num
+print list(flatten(nested))   # [1, 2, 3, 4, 5]
+
+
+# 生成器推导式(用()而不用[])
+g = ((i + 2) ** 2 for i in range(2, 27))
+# <generator object <genexpr> at 0x01880B70>
+print g
+print g.next()  # 16
+# 可以将生成器推导式放在函数作为参数，而不用另外加括号
+print sum(i ** 2 for i in range(10))    # 285
+
+
+# 递归生成器
+def flatten(nested):
+    print nested
+    try:
+        try:
+            '' + nested
+        except TypeError:
+            pass
+        else:
+            raise TypeError
+
+        for sublist in nested:
+            for element in flatten(sublist):
+                yield element
+    except TypeError:
+        yield nested
+# [1, 2, 3, 4, 5, 6, 7, 8]
+print list(flatten([[[1], 2], 3, 4, [5, [6, 7]], 8]))
+# ['foo', 'bar', 'baz']
+print list(flatten(['foo', ['bar', ['baz']]]))
+
+
+# send(message) 使得(yield value)表达式返回值message,通常用于改变参数的值
+# close方法用于结束生成器，如果再close之后，再去生成值，则会抛出RuntimeError
+# 可以用append来模拟生成器
+def repeat(value):
+    while True:
+        new = (yield value)
+        print new
+        if new is not None:
+            value = new
+r = repeat(42)
+r.next()    # 42
+print  r.send("Hello")
+
+
+# 八皇后问题
+# state代表之前的皇后的位置，如state[0]=3，表示第一个皇后放在水平位置为4的地方
+# nextX表示下一个皇后应该放的水平位置
+def conflict(state, nextX):
+    nextY = len(state)
+    for i in range(nextY):
+        if abs(state[i] - nextX) in (0, nextY - i):
+            return True
+    return False
+
+
+# num表示一共要放多少个皇后
+# state表示已经放好的皇后位置
+# 处理如果是放最后一个皇后的情况
+def queens(num=8, state=()):
+    for pos in range(num):
+        if not conflict(state, pos):
+            if len(state) == num - 1:
+                yield (pos,)
+            else:
+                for result in queens(num, state + (pos,)):
+                    yield (pos, ) + result
+
+print list(queens(3))  # []
+# [(1, 3, 0, 2), (2, 0, 3, 1)]
+print list(queens(4))
+
+
+
+
