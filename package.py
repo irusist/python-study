@@ -14,3 +14,10 @@ __author__ = 'zhulixin'
 # pypi      http://pypi.python.org
 
 
+# ConfigParser模块        http://docs.python.org/3/library/configparser.html
+# logging模块
+# Donald Knuth的<<计算机程序设计艺术>>卷1-卷3
+# Concepts Techniques and.Models of Computer Programming(CTMOCP)
+# How to Design Programs - An Introduction to Programming and Computing
+
+
